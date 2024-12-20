@@ -1,13 +1,14 @@
 'use client';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 export default function Search({ placeholder }: { placeholder: string }) {
-  const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
-    function handeleSearch(term: string) {
+    const handleSearch = useDebouncedCallback( (term: string) =>{
         const params = new URLSearchParams(searchParams);
         if (term) {
             params.set('query', term)
@@ -15,8 +16,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
             params.delete('query')
         }
         replace(`${pathname}?${params.toString()}`);
-        console.log(params)
-    }
+    },300)
     return (
     <div className="relative flex flex-1 flex-shrink-0">
       <label htmlFor="search" className="sr-only">
@@ -26,7 +26,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
         className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
         placeholder={placeholder}
         onChange={(e) => {
-            handeleSearch(e.target.value)
+            handleSearch(e.target.value)
         }}
         defaultValue={searchParams.get('query')?.toString()}
       />
